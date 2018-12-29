@@ -8,8 +8,6 @@ var GoogleHomePlayer = require('google-home-player');
 const TuyAPI = require('tuyapi');
 const miio = require('miio');
 
-const dehumidifierDevice = new TuyAPI(sails.config.dehumidifierDevice);
-
 const lampDevice = 4;
 const noelDevice = 3;
 
@@ -20,7 +18,7 @@ module.exports = {
   },
   sensors: function(req, res) {
     var soft = '';
-    
+
     if (sails.config.temperatureHumiditysensor.type == 'bme280')
       soft = '/home/pi/bme280-adafruit.py';
     else if (sails.config.temperatureHumiditysensor.type == 'dht')
@@ -37,7 +35,7 @@ module.exports = {
   },
   plugStatus: function(req, res) {
     if (req.param('device') == 'dehumidifier')
-      device = dehumidifierDevice;
+      device = new TuyAPI(sails.config.dehumidifierDevice);;
 
     device.get().then(status => {
       res.send({'status': status});
@@ -45,7 +43,7 @@ module.exports = {
   },
   plugStatusChange: function(req, res) {
     if (req.param('device') == 'dehumidifier')
-      device = dehumidifierDevice;
+      device = new TuyAPI(sails.config.dehumidifierDevice);;
 
     device.set({set: req.param('status') == 'on'}).then(result => {
       device.get().then(status => {
