@@ -43,5 +43,8 @@ module.exports = {
         code: '11111',
   }
 };
-
 ```
+
+## Todo
+- [ ] Option pour désactiver les webcam si au moins une personne à la maison
+- [ ] Récupération asynchrone des images webcam
