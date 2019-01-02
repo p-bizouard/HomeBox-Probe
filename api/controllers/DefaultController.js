@@ -62,31 +62,37 @@ module.exports = {
     else
       status = false;
 
+     console.log('Test to', sails.config.vacuumDevice);
     miio.device(sails.config.vacuumDevice)
     .then(async function(device) {
-//      console.log('Connected to', device);
+     console.log('Connected to', device);
 
-      var soft = '/usr/local/bin/mirobo --ip ' + sails.config.vacuumDevice.ip + ' --token ' + sails.config.miioToken + ' ' + (status ? 'start' : 'home');
-      child = exec(soft, async function (error, stdout, stderr) {
-        if (error)
-          console.log(error);
-        if (stderr)
-          console.log(stderr);
+      await device.clean();
+      const isCleaning = await device.cleaning();
+      res.send({'status': isCleaning});
+     console.log('Connected to', device);
 
-        if ((status && stdout.includes('Starting cleaning')) || (!status && stdout.includes('return to home')))
-          res.send({'status': true});
-        else
-          res.send({'status': false});
+      // var soft = '/usr/local/bin/mirobo --ip ' + sails.config.vacuumDevice.ip + ' --token ' + sails.config.miioToken + ' ' + (status ? 'start' : 'home');
+      // child = exec(soft, async function (error, stdout, stderr) {
+      //   if (error)
+      //     console.log(error);
+      //   if (stderr)
+      //     console.log(stderr);
+
+      //   if ((status && stdout.includes('Starting cleaning')) || (!status && stdout.includes('return to home')))
+      //     res.send({'status': true});
+      //   else
+      //     res.send({'status': false});
 
         //console.log(stdout);
-      });
+      // });
     })
     .catch(console.error);
   },
   vacuumStatus: async function(req, res) {
     miio.device(sails.config.vacuumDevice)
     .then(async function(device) {
-      console.log('Connected to', device);
+      // console.log('Connected to', device);
       const isCleaning = await device.cleaning();
       res.send({'status': isCleaning});
     })
