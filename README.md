@@ -11,17 +11,18 @@ Pour rappel, ports WiringPi : https://fr.pinout.xyz/pinout/wiringpi
 module.exports = {
   port: 8081,
   temperatureHumiditysensor: {
-        type: 'dht',
-        port: 17
+    type: 'dht',
+    version: 22,
+    port: 4
   },
   // temperatureHumiditysensor: {
-  //       type: 'bme280'
+  //   type: 'bme280'
   // },
   
   // https://github.com/aholstenson/miio
   vacuumDevice: {
-        address: '',
-        token: ''
+    address: '',
+    token: ''
   },
   
   // https://github.com/codetheweb/tuyapi
@@ -33,18 +34,22 @@ module.exports = {
   
   // https://github.com/mihyaeru21/google-home-player
   googleHomeDevice: {
-        ip: '',
-        lang: 'fr',
+    ip: '',
+    lang: 'fr',
   },
   
   // https://github.com/marvinroger/node-rcswitch
   switchDevice: {
-        pin: 16,
-        code: '11111',
+    pin: 16,
+    code: '11111',
+    devices: {
+      'nas' : 1,
+      'lamp' : 4
+    }
   }
 };
 ```
 
 ## Todo
 - [ ] Option pour désactiver les webcam si au moins une personne à la maison
-- [ ] Récupération asynchrone des images webcam
+- [X] Récupération asynchrone des images webcam
