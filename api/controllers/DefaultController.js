@@ -2,7 +2,7 @@ async = require('async');
 rcswitch = require("rcswitch");
 var sys = require('sys')
 var exec = require('child_process').exec;
-
+var ip = require('ip');
 var GoogleHomePlayer = require('google-home-player');
 
 const TuyAPI = require('tuyapi');
@@ -114,13 +114,17 @@ module.exports = {
     res.send({'status': req.param('status') == 'on'});
   },
   ping: function(req, res) {
-    var hosts;
-    hosts = req.param('hosts');
+    var hosts = req.param('hosts');
+    var mask = 24;
+    var currentNetwork = ip.mask(ip.address(), ip.fromPrefixLen(24));
 
-    child = exec("sudo arp-scan --localnet", function (error, stdout, stderr) {
+    child = exec("sudo nmap -sP " + currentNetwork + "/" + mask + " ; sudo arp-scan --localnet ; sudo nmap -sP " + currentNetwork + "/" + mask, function (error, stdout, stderr) {
       if (error !== null)
-        console.log('exec error: ' + error);
-      console.log(stdout);
+      {
+        console.log('NMAP & ARP-SCAN error : ', error);
+        res.send({'status': 'error'});
+        return false;
+      }
 
       async.map(hosts, (function(host, callback) {
         var regex = RegExp(host.replace('.', '\.'),'gm');
