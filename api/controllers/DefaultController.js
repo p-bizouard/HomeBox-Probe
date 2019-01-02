@@ -8,9 +8,6 @@ var GoogleHomePlayer = require('google-home-player');
 const TuyAPI = require('tuyapi');
 const miio = require('miio');
 
-const lampDevice = 4;
-const noelDevice = 3;
-
 module.exports = {
   home: function(req, res) {
     res.status(404);
@@ -22,11 +19,10 @@ module.exports = {
     if (sails.config.temperatureHumiditysensor.type == 'bme280')
       soft = '/home/pi/bme280-adafruit.py';
     else if (sails.config.temperatureHumiditysensor.type == 'dht')
-      soft = '/home/pi/dht-adafruit.py 22 4';
+      soft = '/home/pi/dht-adafruit.py ' + sails.config.temperatureHumiditysensor.version + ' ' + sails.config.temperatureHumiditysensor.port;
     else
       return ;
 
-    console.log('Execute : ', soft);
     child = exec(soft, function (error, stdout, stderr) {
       if (error !== null)
         console.log('exec error: ' + error);
@@ -62,37 +58,18 @@ module.exports = {
     else
       status = false;
 
-     console.log('Test to', sails.config.vacuumDevice);
     miio.device(sails.config.vacuumDevice)
     .then(async function(device) {
-     console.log('Connected to', device);
-
       await device.clean();
       const isCleaning = await device.cleaning();
+      console.log("Vacuum status set to " + req.param('status'));
       res.send({'status': isCleaning});
-     console.log('Connected to', device);
-
-      // var soft = '/usr/local/bin/mirobo --ip ' + sails.config.vacuumDevice.ip + ' --token ' + sails.config.miioToken + ' ' + (status ? 'start' : 'home');
-      // child = exec(soft, async function (error, stdout, stderr) {
-      //   if (error)
-      //     console.log(error);
-      //   if (stderr)
-      //     console.log(stderr);
-
-      //   if ((status && stdout.includes('Starting cleaning')) || (!status && stdout.includes('return to home')))
-      //     res.send({'status': true});
-      //   else
-      //     res.send({'status': false});
-
-        //console.log(stdout);
-      // });
     })
     .catch(console.error);
   },
   vacuumStatus: async function(req, res) {
     miio.device(sails.config.vacuumDevice)
     .then(async function(device) {
-      // console.log('Connected to', device);
       const isCleaning = await device.cleaning();
       res.send({'status': isCleaning});
     })
@@ -100,11 +77,7 @@ module.exports = {
   },
   rf433StatusChange: function(req, res) {
     rcswitch.enableTransmit(sails.config.switchDevice.pin);
-
-    if (req.param('device') == 'lamp')
-      device = lampDevice;
-    else if (req.param('device') == 'noel')
-      device = noelDevice;
+    const device = sails.config.switchDevice.devices[req.param('device')];
 
     if (req.param('status') == 'on')
       rcswitch.switchOn(sails.config.switchDevice.code, device);
