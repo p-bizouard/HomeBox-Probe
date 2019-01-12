@@ -52,8 +52,5 @@ module.exports = {
 
 ## Todo
 - [ ] Standardiser les "plugDevices" de tuyApi
-- [ ] Callback de configuration lors d'entrée ou de sortie de personnes
-- [ ] Option pour automatiquement lancer ou éteindre un plugDevice lorsqu'au moins une personne arrive à "maison" après une arrivée
-- [ ] Option pour automatiquement lancer ou éteindre un plugDevice lorsqu'aucune personne n'est à "maison" après un départ
 - [ ] Option pour désactiver les webcam si au moins une personne à la maison
 - [X] Récupération asynchrone des images webcam
