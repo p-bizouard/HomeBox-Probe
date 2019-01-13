@@ -59,6 +59,6 @@ sudo raspi-config
 ```
 
 ## Todo
-- [ ] Standardiser les "plugDevices" de tuyApi
+- [X] Standardiser les "plugDevices" de tuyApi
 - [ ] Option pour désactiver les webcam si au moins une personne à la maison
 - [X] Récupération asynchrone des images webcam
