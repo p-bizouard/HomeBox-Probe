@@ -24,8 +24,8 @@ module.exports.routes = {
   'get /': 'DefaultController.home',
   'get /sensors': 'DefaultController.sensors',
 
-  'get /plug/:device': 'DefaultController.plugStatus',
-  'post /plug/:device': 'DefaultController.plugStatusChange',
+  'get /plug/:device': 'DefaultController.plugDeviceStatus',
+  'post /plug/:device': 'DefaultController.plugDeviceStatusChange',
 
   'post /rf433/:device': 'DefaultController.rf433StatusChange',
 

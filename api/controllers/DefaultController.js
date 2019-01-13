@@ -43,17 +43,29 @@ module.exports = {
       }
     });
   },
-  plugStatus: function(req, res) {
-    if (req.param('device') == 'dehumidifier')
-      device = new TuyAPI(sails.config.dehumidifierDevice);;
+  plugDeviceStatus: function(req, res) {
+    if (!sails.config.plugDevices.hasOwnProperty(req.param('device')))
+    {
+      res.send({'status': 'error'});
+      sails.log.error('Plug device [' + req.param('device') + ']  not found');
+      return ;
+    }
+
+    device = new TuyAPI(sails.config.plugDevices[req.param('device')]);
 
     device.get().then(status => {
       res.send({'status': status});
     });
   },
-  plugStatusChange: function(req, res) {
-    if (req.param('device') == 'dehumidifier')
-      device = new TuyAPI(sails.config.dehumidifierDevice);;
+  plugDeviceStatusChange: function(req, res) {
+    if (!sails.config.plugDevices.hasOwnProperty(req.param('device')))
+    {
+      res.send({'status': 'error'});
+      sails.log.error('Plug device [' + req.param('device') + ']  not found');
+      return ;
+    }
+
+    device = new TuyAPI(sails.config.plugDevices[req.param('device')]);
 
     device.set({set: req.param('status') == 'on'}).then(result => {
       device.get().then(status => {
