@@ -1,19 +1,21 @@
-async = require('async');
-rcswitch = require("rcswitch");
+const async = require('async');
+const rcswitch = require("rcswitch");
 var sys = require('sys')
 var exec = require('child_process').exec;
 var ip = require('ip');
 var GoogleHomePlayer = require('google-home-player');
-
+const awaitExec = require('await-exec');
 const TuyAPI = require('tuyapi');
 const miio = require('miio');
+var sleep = require('sleep');
+var median = require('median')
 
 module.exports = {
   home: function(req, res) {
     res.status(404);
     return res.send('File not found');
   },
-  sensors: function(req, res) {
+  sensors: async function(req, res) {
     var soft = '';
 
     if (sails.config.temperatureHumiditysensor.type == 'bme280')
@@ -28,20 +30,27 @@ module.exports = {
     if (!sails.config.temperatureHumiditysensor.hasOwnProperty('humidityCalibration'))
       sails.config.temperatureHumiditysensor.humidityCalibration = 0;
 
-    child = exec(soft, function (error, stdout, stderr) {
-      if (error !== null)
-      {
-        console.log('exec error: ' + error);
-        res.send(stderr);
-      }  
-      else
-      {
-        var result = JSON.parse(stdout);
-        result.temperature = Math.round((parseFloat(result.temperature) + parseFloat(sails.config.temperatureHumiditysensor.temperatureCalibration)) * 100) / 100;
-        result.humidity = Math.round((parseFloat(result.humidity) + parseFloat(sails.config.temperatureHumiditysensor.humidityCalibration)) * 100) / 100;
-        res.send(JSON.stringify(result)); 
-      }
-    });
+    var temperatureArray = [];
+    var humidityArray = [];
+    for (let i = 0; i < 6; i++)
+    {
+      var result = await awaitExec(soft);
+      if (result.stderr) continue ;
+      result = JSON.parse(result.stdout.replace('\n', ''));
+      
+      temperature = Math.round((parseFloat(result.temperature) + parseFloat(sails.config.temperatureHumiditysensor.temperatureCalibration)) * 100) / 100;
+      humidity = Math.round((parseFloat(result.humidity) + parseFloat(sails.config.temperatureHumiditysensor.humidityCalibration)) * 100) / 100; 
+
+      temperatureArray.push(temperature);
+      humidityArray.push(humidity);
+
+      sleep.sleep(1);
+    }
+      
+    res.send(JSON.stringify({
+      temperature: median(temperatureArray),
+      humidity: median(humidityArray),
+    }));
   },
   plugDeviceStatus: function(req, res) {
     if (!sails.config.plugDevices.hasOwnProperty(req.param('device')))
