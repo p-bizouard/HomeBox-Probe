@@ -38,8 +38,8 @@ module.exports = {
       if (result.stderr) continue ;
       result = JSON.parse(result.stdout.replace('\n', ''));
       
-      temperature = Math.round((parseFloat(result.temperature) + parseFloat(sails.config.temperatureHumiditysensor.temperatureCalibration)) * 100) / 100;
-      humidity = Math.round((parseFloat(result.humidity) + parseFloat(sails.config.temperatureHumiditysensor.humidityCalibration)) * 100) / 100; 
+      temperature = parseFloat(result.temperature) + parseFloat(sails.config.temperatureHumiditysensor.temperatureCalibration);
+      humidity = parseFloat(result.humidity) + parseFloat(sails.config.temperatureHumiditysensor.humidityCalibration); 
 
       temperatureArray.push(temperature);
       humidityArray.push(humidity);
@@ -48,8 +48,8 @@ module.exports = {
     }
       
     res.send(JSON.stringify({
-      temperature: median(temperatureArray),
-      humidity: median(humidityArray),
+      temperature: Math.round(median(temperatureArray) * 100) / 100,
+      humidity: Math.round(median(humidityArray) * 100) / 100,
     }));
   },
   plugDeviceStatus: function(req, res) {
