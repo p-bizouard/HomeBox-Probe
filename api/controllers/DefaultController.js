@@ -23,10 +23,24 @@ module.exports = {
     else
       return ;
 
+    if (!sails.config.temperatureHumiditysensor.hasOwnProperty('temperatureCalibration'))
+      sails.config.temperatureHumiditysensor.temperatureCalibration = 0;
+    if (!sails.config.temperatureHumiditysensor.hasOwnProperty('humidityCalibration'))
+      sails.config.temperatureHumiditysensor.humidityCalibration = 0;
+
     child = exec(soft, function (error, stdout, stderr) {
       if (error !== null)
+      {
         console.log('exec error: ' + error);
-      res.send(stdout);
+        res.send(stderr);
+      }  
+      else
+      {
+        var result = JSON.parse(stdout);
+        result.temperature += sails.config.temperatureHumiditysensor.temperatureCalibration;
+        result.humidity += sails.config.temperatureHumiditysensor.humidityCalibration;
+        res.send(JSON.stringify(result)); 
+      }
     });
   },
   plugStatus: function(req, res) {
