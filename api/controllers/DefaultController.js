@@ -37,8 +37,8 @@ module.exports = {
       else
       {
         var result = JSON.parse(stdout);
-        result.temperature += sails.config.temperatureHumiditysensor.temperatureCalibration;
-        result.humidity += sails.config.temperatureHumiditysensor.humidityCalibration;
+        result.temperature = Math.round((result.temperature + sails.config.temperatureHumiditysensor.temperatureCalibration) * 100) / 100;
+        result.humidity = Math.round((result.humidity + sails.config.temperatureHumiditysensor.humidityCalibration) * 100) / 100;
         res.send(JSON.stringify(result)); 
       }
     });
