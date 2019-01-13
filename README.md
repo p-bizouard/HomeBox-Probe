@@ -1,4 +1,4 @@
-# HomeBox UI
+# HomeBox Probe
 
 ## Download
 ```bash
@@ -50,6 +50,15 @@ module.exports = {
 };
 ```
 
+## Enable i2c if required
+```
+sudo raspi-config
+-> Interfaces
+-> I2c
+-> Enable
+```
+
 ## Todo
+- [ ] Standardiser les "plugDevices" de tuyApi
 - [ ] Option pour désactiver les webcam si au moins une personne à la maison
 - [X] Récupération asynchrone des images webcam
