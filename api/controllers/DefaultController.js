@@ -114,15 +114,19 @@ module.exports = {
     miio.device(sails.config.xiaomiDevices)
     .then(async function(device) {
     
-      const sensorDevice = sails.config.xiaomiDevices.devices[req.param('device')];
+      var sensorDeviceConfiguration = sails.config.xiaomiDevices.devices[req.param('device')];
       const children = device.children();
 
-      for(const child of children) {
-        console.log(child);
-        if (child.matches('type:miio:subdevice') && child.matches('cap:temperature') && child.internalId == sensorDevice.id) {
+      if (!sensorDeviceConfiguration.hasOwnProperty('temperatureCalibration'))
+        sensorDeviceConfiguration.temperatureCalibration = 0;
+      if (!sensorDeviceConfiguration.hasOwnProperty('humidityCalibration'))
+        sensorDeviceConfiguration.humidityCalibration = 0;
 
-          const temperature = (await child.temperature()).value;
-          const humidity = (await child.relativeHumidity());
+      for(const child of children) {
+        if (child.matches('type:miio:subdevice') && child.matches('cap:temperature') && child.internalId == sensorDeviceConfiguration.id) {
+
+          const temperature = Math.round(((await child.temperature()).value + parseFloat(sensorDeviceConfiguration.temperatureCalibration)) * 10) / 10;
+          const humidity = Math.round(((await child.relativeHumidity()) + parseFloat(sensorDeviceConfiguration.humidityCalibration)) * 10) / 10;
 
           res.send(JSON.stringify({
             temperature: temperature,
