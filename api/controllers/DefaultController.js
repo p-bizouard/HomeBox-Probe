@@ -48,8 +48,8 @@ module.exports = {
     }
       
     res.send(JSON.stringify({
-      temperature: Math.round(median(temperatureArray) * 100) / 100,
-      humidity: Math.round(median(humidityArray) * 100) / 100,
+      temperature: Math.round(median(temperatureArray) * 10) / 10,
+      humidity: Math.round(median(humidityArray) * 10) / 10,
     }));
   },
   plugDeviceStatus: function(req, res) {
@@ -107,6 +107,31 @@ module.exports = {
     .then(async function(device) {
       const isCleaning = await device.cleaning();
       res.send({'status': isCleaning});
+    })
+    .catch(console.error);
+  },
+  xiaomiSensorStatus: async function(req, res) {
+    miio.device(sails.config.xiaomiDevices)
+    .then(async function(device) {
+    
+      const sensorDevice = sails.config.xiaomiDevices.devices[req.param('device')];
+      const children = device.children();
+
+      for(const child of children) {
+        console.log(child);
+        if (child.matches('type:miio:subdevice') && child.matches('cap:temperature') && child.internalId == sensorDevice.id) {
+
+          const temperature = (await child.temperature()).value;
+          const humidity = (await child.relativeHumidity());
+
+          res.send(JSON.stringify({
+            temperature: temperature,
+            humidity: humidity,
+          }));
+          return ;
+        }
+      }
+      res.send({'status': false});
     })
     .catch(console.error);
   },

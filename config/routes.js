@@ -35,8 +35,9 @@ module.exports.routes = {
   'post /ping': 'DefaultController.ping',
   'post /switch': 'DefaultController.switch',
 
-  'post /google-home': 'DefaultController.googleHomeSay'
+  'post /google-home': 'DefaultController.googleHomeSay',
 
+  'get /xiaomi/:device/status': 'DefaultController.xiaomiSensorStatus',
 
   /***************************************************************************
   *                                                                          *
